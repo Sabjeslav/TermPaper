@@ -3,13 +3,6 @@
         <v-container>
             <v-row>
                 <template>
-                    <!-- <v-text-field v-model="newTask" label="Додати нову задачу" solo>
-                        <template v-slot:append>
-                            <v-fade-transition>
-                                <v-icon v-if="newTask" @click="create">add_circle</v-icon>
-                            </v-fade-transition>
-                        </template>
-                    </v-text-field> -->
                     <v-row>
                     <v-dialog v-model="dialog" persistent max-width="600px">
                         <template v-slot:activator="{ on, attrs }">
@@ -25,10 +18,10 @@
                             <v-container>
                                 <v-row>
                                 <v-col cols="12">
-                                    <v-text-field label="Назва*" required color="secondary"> </v-text-field>
+                                    <v-text-field label="Назва*" required color="secondary" v-model.trim="task.title"> </v-text-field>
                                 </v-col>
                                 <v-col cols="12">
-                                    <v-text-field label="Опис" color="secondary"> </v-text-field>
+                                    <v-text-field label="Опис" color="secondary" v-model.trim="task.description"> </v-text-field>
                                 </v-col>
                                 </v-row>
                             </v-container>
@@ -39,7 +32,7 @@
                             <v-btn color="blue darken-1" text @click="dialog = false">
                                 Закрити
                             </v-btn>
-                            <v-btn color="blue darken-1" text @click="dialog = false">
+                            <v-btn color="blue darken-1" text @click="dialog = false; addTask()">
                                 Зберегти
                             </v-btn>
                             </v-card-actions>
@@ -52,9 +45,9 @@
                         </v-col>
                     </template>
                     <template v-else>
-                        <v-col cols="12">
+                        <!-- <v-col cols="12">
                             <strong color="date">Виконано задач: {{completedTasks.length}} / {{tasks.length}}</strong>
-                        </v-col>
+                        </v-col> -->
                         <v-col  v-for="task in tasks" :key="task.title" cols="12" md="6" lg="4" xl="3" >
                             <v-card elevation-11 fill-height>
                                 <v-card-title primary-title>
@@ -96,17 +89,18 @@
 </template>
 
 <script>
+import TaskService from '../services/TaskService'
 export default {
     data() {
         return {
             dialog: false,
-            newTask: null,
+            task: {title: '', description: ''},
             tasks: [
-                    {title: 'Зробити курсову', description: 'Курсова на тему додаток для керування часом', isDone: false},
-                    {title: 'Зробити ММО', description: 'Виправити проміжну атестацію', isDone: false},
-                    {title: 'Практичні роботи1', description: 'З предмета Мережі', isDone: false},
-                    {title: 'Практичні роботи2', description: 'З предмета якогось', isDone: false},
-                    {title: 'Практичні роботи3', description: 'З предмета Мережі', isDone: false},
+                    // {title: 'Зробити курсову', description: 'Курсова на тему додаток для керування часом', isDone: false},
+                    // {title: 'Зробити ММО', description: 'Виправити проміжну атестацію', isDone: false},
+                    // {title: 'Практичні роботи1', description: 'З предмета Мережі', isDone: false},
+                    // {title: 'Практичні роботи2', description: 'З предмета якогось', isDone: false},
+                    // {title: 'Практичні роботи3', description: 'З предмета Мережі', isDone: false},
             ]
         }
     },
@@ -120,15 +114,24 @@ export default {
     },
     mounted() {
         console.log(this.$vuetify.breakpoint.name)
+        this.getTasks()
     },
     methods: {
-        create () {
-            this.tasks.push({
-                done: false,
-                text: this.newTask,
-            })
-            this.newTask = null
+        async getTasks() {
+            const response = await TaskService.fetchTasks();
+            this.tasks = response.data.tasks
         },
+        async addTask () {
+        if (this.task.title !== '' && this.task.description !== '') {
+          await TaskService.addNewTask({
+            title: this.task.title,
+            description: this.task.description
+          })
+        //   this.$router.push({ name: 'Posts' })
+        } else {
+          alert('Empty fields!')
+        }
+      },
     }
 }
 </script>
