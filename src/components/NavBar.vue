@@ -70,7 +70,7 @@ export default {
             menu: false,
             drawer: false,
             links: [
-                { title: 'Активні задачі', icon: 'mdi-view-dashboard', route: '/' },
+                { title: 'Активні задачі', icon: 'mdi-view-dashboard', route: '/tasks' },
                 { title: 'Архів', icon: 'archive', route: '/archive' },
                 { title: 'Про додаток', icon: 'mdi-help-box', route: '/about' },
             ],

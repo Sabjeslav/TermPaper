@@ -6,11 +6,13 @@ import Router from 'vue-router'
 import ActiveTasks from '../components/ActiveTasks.vue'
 import About from '../components/about.vue'
 import Archive from '../components/Archive.vue'
+import EditTask from '../components/ModalWindow.vue'
 
 const routes = [
-    {path: '/', name: 'ActiveTasks', component: ActiveTasks},
+    {path: '/tasks', name: 'ActiveTasks', component: ActiveTasks},
     {path: '/about', name: 'about', component: About},
-    {path: '/archive', name: 'archive', component: Archive}
+    {path: '/archive', name: 'archive', component: Archive},
+    {path: '/tasks/:id', name: 'EditTask', component: EditTask}
 ]
 
 Vue.use(Router)

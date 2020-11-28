@@ -5,8 +5,8 @@
                 <template>
                     <v-row>
                     <v-dialog v-model="dialog" persistent max-width="600px">
-                        <template v-slot:activator="{ on, attrs }">
-                            <v-btn color="primary" block dark v-bind="attrs" v-on="on" x-large>
+                        <template v-slot:activator="{ on }">
+                            <v-btn color="primary" block v-on="on" x-large>
                                 Додати задачу
                             </v-btn>
                         </template>
@@ -15,29 +15,29 @@
                                 <span class="headline">Нова задача</span>
                             </v-card-title>
                             <v-card-text>
-                            <v-container>
-                                <v-row>
-                                <v-col cols="12">
-                                    <v-text-field label="Назва*" required color="secondary" v-model.trim="task.title"> </v-text-field>
-                                </v-col>
-                                <v-col cols="12">
-                                    <v-text-field label="Опис" color="secondary" v-model.trim="task.description"> </v-text-field>
-                                </v-col>
-                                </v-row>
-                            </v-container>
-                            <small>*показує обов'язкові поля</small>
+                                <v-container>
+                                    <v-row>
+                                    <v-col cols="12">
+                                        <v-text-field label="Назва*" required color="secondary" v-model.trim="task.title"> </v-text-field>
+                                    </v-col>
+                                    <v-col cols="12">
+                                        <v-text-field label="Опис" color="secondary" v-model.trim="task.description"> </v-text-field>
+                                    </v-col>
+                                    </v-row>
+                                </v-container>
+                            <small>*обов'язкові поля</small>
                             </v-card-text>
                             <v-card-actions>
                             <v-spacer></v-spacer>
                             <v-btn color="blue darken-1" text @click="dialog = false">
                                 Закрити
                             </v-btn>
-                            <v-btn color="blue darken-1" text @click="dialog = false; addTask()">
+                            <v-btn color="blue darken-1" text @click="addHandler">
                                 Зберегти
                             </v-btn>
                             </v-card-actions>
                         </v-card>
-                        </v-dialog>
+                    </v-dialog>
                     </v-row>
                     <template v-if="tasks.length == 0">
                         <v-col cols="12" class="text-center mt-15">
@@ -45,43 +45,48 @@
                         </v-col>
                     </template>
                     <template v-else>
-                        <!-- <v-col cols="12">
-                            <strong color="date">Виконано задач: {{completedTasks.length}} / {{tasks.length}}</strong>
-                        </v-col> -->
-                        <v-col  v-for="task in tasks" :key="task.title" cols="12" md="6" lg="4" xl="3" >
+
+                        <v-col cols="12"> </v-col>
+
+                        <v-col  v-for="task in tasks" :key="task._id" cols="12" md="6" lg="4" xl="3" >
                             <v-card elevation-11 fill-height>
+
                                 <v-card-title primary-title>
                                     {{task.title}}
                                 </v-card-title>
-                                <v-divider></v-divider>
+
+                                    <v-divider></v-divider>
+
                                 <v-card-text >
                                     {{task.description}}
                                 </v-card-text>
-                                <v-spacer></v-spacer>
+
+                                    <v-spacer></v-spacer>
+
                                 <v-card-actions>
 
-                                    <v-btn outlined rounded text>
+                                    <v-btn outlined rounded text @click="editTask(task._id)">
                                         <span class="text-caption">Виконано</span>
                                         <v-icon right color="green">done_all</v-icon>
                                     </v-btn>
 
-                                    <v-btn outlined rounded text>
-                                        <span class="text-caption">Редагувати</span>
-                                        <v-icon right color="orange">edit</v-icon>
-                                    </v-btn>
+                                    <router-link :to="{name: 'EditTask', params: {id: task._id}}" style="text-decoration: none;">
+                                        <v-btn class="ml-2" outlined rounded text >
+                                            <span class="text-caption">Редагувати</span>
+                                            <v-icon right color="orange">edit</v-icon>
+                                        </v-btn>
+                                    </router-link>
 
                                     <v-spacer></v-spacer>
-
-                                    <v-btn outlined rounded text>
+                                
+                                    <v-btn outlined rounded text @click="removeTask(task._id)">
                                         <v-icon class="rounded-circle" color="red" style="font-size: 20px">delete</v-icon>
                                     </v-btn>
 
                                 </v-card-actions>   
                             </v-card>
-                    </v-col>
-                        
-                    </template>
-                    
+                        </v-col>  
+                    </template> 
                 </template>
             </v-row>
         </v-container>
@@ -94,42 +99,57 @@ export default {
     data() {
         return {
             dialog: false,
-            task: {title: '', description: ''},
-            tasks: [
-                    // {title: 'Зробити курсову', description: 'Курсова на тему додаток для керування часом', isDone: false},
-                    // {title: 'Зробити ММО', description: 'Виправити проміжну атестацію', isDone: false},
-                    // {title: 'Практичні роботи1', description: 'З предмета Мережі', isDone: false},
-                    // {title: 'Практичні роботи2', description: 'З предмета якогось', isDone: false},
-                    // {title: 'Практичні роботи3', description: 'З предмета Мережі', isDone: false},
-            ]
+            task: {title: '', description: '', isDone: false},
+            tasks: []
         }
     },
-    computed: {
-        completedTasks () {
-            return this.tasks.filter(task => task.isDone).length
-        },
-        progress () {
-            return this.completedTasks / this.tasks.length * 100
-        },
-    },
     mounted() {
-        console.log(this.$vuetify.breakpoint.name)
+        // console.log(this.$vuetify.breakpoint.name),
         this.getTasks()
     },
     methods: {
+        addHandler () {
+            this.addTask()
+            this.dialog = false;
+            this.task.title = this.task.description = '';
+        },
         async getTasks() {
+            console.log('Request sended')
             const response = await TaskService.fetchTasks();
+            console.log('Responce OK')
             this.tasks = response.data.tasks
         },
+        async getTaskById () {
+            const response = await TaskService.getTasks({ id: this.$route.params.id })
+            this.task.title = response.data.title
+            this.task.description = response.data.description
+        },
         async addTask () {
-        if (this.task.title !== '' && this.task.description !== '') {
-          await TaskService.addNewTask({
-            title: this.task.title,
-            description: this.task.description
+            if (this.task.title !== '') {
+                console.log("Adding new task...")
+                await TaskService.addNewTask({
+                    title: this.task.title,
+                    description: this.task.description,
+                    isDone: false
+                })
+                this.getTasks();
+                this.task.title = this.task.description = '';
+            } else {
+                alert('Введіть назву!')
+            }
+        },
+        async removeTask (params) {
+            await TaskService.deleteTask(params)
+            this.getTasks()
+        },
+        async editTask (taskId) {
+        if (this.task.title !== '') {
+          await TaskService.updateTask({
+            id: taskId,
+            isDone: true
           })
-        //   this.$router.push({ name: 'Posts' })
-        } else {
-          alert('Empty fields!')
+          console.log("ALALALA")
+          this.$router.push({path: '/tasks'})
         }
       },
     }
