@@ -57,7 +57,7 @@ router.put('/tasks/:id', (req, res) => {
       if (req.body.title) {
         task.title = req.body.title
       }
-      if (req.body.description) {
+      if (req.body.description || !req.body.description) {
         task.description = req.body.description
       }
       if (req.body.isDone) {
