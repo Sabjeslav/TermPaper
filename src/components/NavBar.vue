@@ -9,22 +9,24 @@
             <v-spacer></v-spacer>
             <div class="text-center">
                 <v-menu v-model="menu" :close-on-content-click="false" offset-y >
-                    <template v-slot:activator="{ on, attrs }">
-                        <v-btn text v-bind="attrs" v-on="on">
+                    <template v-slot:activator="{ on }">
+                        <v-btn text v-on="on">
                             <span class="d-none d-sm-flex">Налаштування</span>
                             <v-icon right>mdi-cog</v-icon>
                         </v-btn>
                     </template>
-                    <v-card>           
-                        <v-list>
-                            <v-list-item>
-                            <v-list-item-action>
-                                    <v-switch @change="toggleDarkTheme" v-model="switchState" color="blue" persistent-hint></v-switch>
-                            </v-list-item-action>
-                            <v-list-item-title>Темна тема</v-list-item-title>
-                            </v-list-item>
-                        </v-list>
-                    </v-card>
+                    <v-expand-transition>
+                        <v-card>           
+                            <v-list>
+                                <v-list-item>
+                                    <v-list-item-action>
+                                            <v-switch @change="toggleDarkTheme" v-model="switchState" color="blue" persistent-hint></v-switch>
+                                    </v-list-item-action>
+                                    <v-list-item-title>Темна тема</v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-card>
+                    </v-expand-transition>
                 </v-menu>
             </div>
             <v-btn text>
@@ -65,6 +67,7 @@
 export default {
     data() {
         return {
+            expand: false,
             darkTheme: false,
             switchState: (localStorage.getItem('dark_theme') === 'true'),
             menu: false,
@@ -88,3 +91,9 @@ export default {
     },
 }
 </script>
+
+<style>
+    *, *::before, *::after {
+        transition: 0.2s;
+    }
+</style>

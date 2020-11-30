@@ -1,8 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-// import routes from '@/routes'
 
-// import App from '../components/App.vue'
 import ActiveTasks from '../components/ActiveTasks.vue'
 import About from '../components/about.vue'
 import Archive from '../components/Archive.vue'

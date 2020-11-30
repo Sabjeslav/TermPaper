@@ -30,19 +30,7 @@
                                     <v-spacer></v-spacer>
 
                                 <v-card-actions>
-
-                                    <!-- <v-btn outlined rounded text>
-                                        <span class="text-caption">Виконано</span>
-                                        <v-icon right color="green">done_all</v-icon>
-                                    </v-btn>
-
-                                    <router-link :to="{name: 'EditTask', params: {id: task._id}}" style="text-decoration: none;">
-                                        <v-btn class="ml-2" outlined rounded text >
-                                            <span class="text-caption">Редагувати</span>
-                                            <v-icon right color="orange">edit</v-icon>
-                                        </v-btn>
-                                    </router-link> -->
-
+                                    
                                     <v-spacer></v-spacer>
                                 
                                     <v-btn outlined rounded text @click="removeTask(task._id)">
@@ -86,3 +74,9 @@ export default {
     }
 }
 </script>
+
+<style>
+    *, *::before, *::after {
+        transition: 0.2s;
+    }
+</style>

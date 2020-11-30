@@ -67,3 +67,9 @@ export default {
     }
 }
 </script>
+
+<style>
+    *, *::before, *::after {
+        transition: 0.2s;
+    }
+</style>

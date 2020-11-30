@@ -45,10 +45,11 @@
                         </v-col>
                     </template>
                     <template v-else>
-
+                        
                         <v-col cols="12"> </v-col>
-
+                        
                         <v-col  v-for="task in tasks" :key="task._id" cols="12" md="6" lg="4" xl="3" >
+                            
                             <v-card elevation-11 fill-height>
 
                                 <v-card-title primary-title>
@@ -78,14 +79,20 @@
                                     </router-link>
 
                                     <v-spacer></v-spacer>
-                                
-                                    <v-btn outlined rounded text @click="removeTask(task._id)">
-                                        <v-icon class="rounded-circle" color="red" style="font-size: 20px">delete</v-icon>
-                                    </v-btn>
 
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <v-btn outlined rounded text v-on="on" @click="removeTask(task._id)">
+                                                <v-icon class="rounded-circle" color="red" style="font-size: 20px">delete</v-icon>
+                                            </v-btn>
+                                        </template>
+                                        <span>Видалити</span>
+                                    </v-tooltip>
+    
                                 </v-card-actions>   
                             </v-card>
-                        </v-col>  
+                            
+                        </v-col>                          
                     </template> 
                 </template>
             </v-row>
@@ -104,7 +111,6 @@ export default {
         }
     },
     mounted() {
-        // console.log(this.$vuetify.breakpoint.name),
         this.getTasks()
     },
     methods: {
@@ -114,9 +120,7 @@ export default {
             this.task.title = this.task.description = '';
         },
         async getTasks() {
-            console.log('Request sended')
             const response = await TaskService.fetchTasks();
-            console.log('Responce OK')
             this.tasks = response.data.tasks
         },
         async getTaskById () {
@@ -143,15 +147,18 @@ export default {
             this.getTasks()
         },
         async editTask (taskId) {
-        if (this.task.title !== '') {
           await TaskService.updateTask({
             id: taskId,
             isDone: true
           })
-          console.log("ALALALA")
-          this.$router.push({path: '/tasks'})
+          this.getTasks();
         }
       },
     }
-}
 </script>
+
+<style>
+    *{
+        transition: 0.2s;
+    }
+</style>

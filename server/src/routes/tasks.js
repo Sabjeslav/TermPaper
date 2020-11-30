@@ -50,7 +50,7 @@ router.get('/tasks/:id', (req, res) => {
 })
 
 router.put('/tasks/:id', (req, res) => {
-  Task.findById(req.params.id, 'title description', (err, task) => {
+  Task.findById(req.params.id, 'title description isDone', (err, task) => {
     if (err) {
       console.log(err)
     } else {
