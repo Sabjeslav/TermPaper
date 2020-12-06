@@ -10,7 +10,8 @@ const routes = [
     {path: '/tasks', name: 'ActiveTasks', component: ActiveTasks},
     {path: '/about', name: 'about', component: About},
     {path: '/archive', name: 'archive', component: Archive},
-    {path: '/tasks/:id', name: 'EditTask', component: EditTask}
+    {path: '/tasks/:id', name: 'EditTask', component: EditTask},
+    {path: '*', redirect: '/tasks'}
 ]
 
 Vue.use(Router)

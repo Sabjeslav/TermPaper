@@ -21,7 +21,7 @@
                                     {{task.title}}
                                 </v-card-title>
 
-                                    <v-divider></v-divider>
+                                    <v-divider color="doneTask"></v-divider>
 
                                 <v-card-text >
                                     {{task.description}}
@@ -30,12 +30,20 @@
                                     <v-spacer></v-spacer>
 
                                 <v-card-actions>
-                                    
+                                    <v-chip color="doneTask">
+                                        Виконано: {{task.date}}
+                                    </v-chip>
+
                                     <v-spacer></v-spacer>
                                 
-                                    <v-btn outlined rounded text @click="removeTask(task._id)">
-                                        <v-icon class="rounded-circle" color="red" style="font-size: 20px">delete</v-icon>
-                                    </v-btn>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <v-btn outlined rounded text v-on="on" @click="removeTask(task._id)">
+                                                <v-icon class="rounded-circle" color="red" style="font-size: 20px">delete</v-icon>
+                                            </v-btn>
+                                        </template>
+                                        <span>Видалити</span>
+                                    </v-tooltip>
 
                                 </v-card-actions>   
                             </v-card>

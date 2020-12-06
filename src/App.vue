@@ -3,7 +3,7 @@
     <v-main color="primary">
         <NavBar/>
         <router-view class="pa-lg-12 pa-md-10 pa-sm-6 pa-xs-2"></router-view>
-    </v-main>
+    </v-main> 
   </v-app>
 </template>
 

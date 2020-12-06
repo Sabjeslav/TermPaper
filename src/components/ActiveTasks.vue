@@ -29,7 +29,7 @@
                             </v-card-text>
                             <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="blue darken-1" text @click="dialog = false">
+                            <v-btn color="blue darken-1" text @click="closeHandler">
                                 Закрити
                             </v-btn>
                             <v-btn color="blue darken-1" text @click="addHandler">
@@ -46,7 +46,9 @@
                     </template>
                     <template v-else>
                         
-                        <v-col cols="12"> </v-col>
+                        <v-col cols="12"> 
+                            
+                        </v-col>
                         
                         <v-col  v-for="task in tasks" :key="task._id" cols="12" md="6" lg="4" xl="3" >
                             
@@ -65,30 +67,42 @@
                                     <v-spacer></v-spacer>
 
                                 <v-card-actions>
-
-                                    <v-btn outlined rounded text @click="editTask(task._id)">
-                                        <span class="text-caption">Виконано</span>
-                                        <v-icon right color="green">done_all</v-icon>
-                                    </v-btn>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <v-btn outlined rounded text v-on="on" @click="editTask(task._id)">
+                                                <v-icon color="green" >done_all</v-icon>
+                                            </v-btn>
+                                        </template>
+                                        <span>Виконано</span>
+                                    </v-tooltip>
 
                                     <router-link :to="{name: 'EditTask', params: {id: task._id}}" style="text-decoration: none;">
-                                        <v-btn class="ml-2" outlined rounded text >
-                                            <span class="text-caption">Редагувати</span>
-                                            <v-icon right color="orange">edit</v-icon>
-                                        </v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                            <v-btn class="ml-2" outlined rounded text v-on="on">
+                                                <v-icon color="orange" style="font-size: 20px">edit</v-icon>
+                                            </v-btn>
+                                        </template>
+                                        <span>Редагувати</span>
+                                        </v-tooltip>
                                     </router-link>
 
-                                    <v-spacer></v-spacer>
+                                    <!-- <v-spacer></v-spacer> -->
 
                                     <v-tooltip bottom>
                                         <template v-slot:activator="{ on }">
-                                            <v-btn outlined rounded text v-on="on" @click="removeTask(task._id)">
+                                            <v-btn class="ml-2" outlined rounded text v-on="on" @click="removeTask(task._id)">
                                                 <v-icon class="rounded-circle" color="red" style="font-size: 20px">delete</v-icon>
                                             </v-btn>
                                         </template>
                                         <span>Видалити</span>
                                     </v-tooltip>
-    
+                                    
+                                    <v-spacer></v-spacer>
+                                     
+                                    <v-chip color="accent" class="date--text">
+                                        {{task.date}}
+                                    </v-chip>
                                 </v-card-actions>   
                             </v-card>
                             
@@ -106,17 +120,22 @@ export default {
     data() {
         return {
             dialog: false,
-            task: {title: '', description: '', isDone: false},
+            task: {title: '', description: '', isDone: false, date: ''},
             tasks: []
         }
     },
     mounted() {
-        this.getTasks()
+        this.getTasks(),
+        this.datePicker()
     },
     methods: {
         addHandler () {
-            this.addTask()
-            this.dialog = false;
+            this.addTask();
+            this.dialog = !this.dialog;
+            this.task.title = this.task.description = '';
+        },
+        closeHandler () {
+            this.dialog = !this.dialog;
             this.task.title = this.task.description = '';
         },
         async getTasks() {
@@ -128,13 +147,18 @@ export default {
             this.task.title = response.data.title
             this.task.description = response.data.description
         },
+        datePicker() {
+            var date = new Date();
+            this.task.date = date.toLocaleDateString();
+        },
         async addTask () {
             if (this.task.title !== '') {
                 console.log("Adding new task...")
                 await TaskService.addNewTask({
                     title: this.task.title,
                     description: this.task.description,
-                    isDone: false
+                    isDone: false,
+                    date: this.task.date
                 })
                 this.getTasks();
                 this.task.title = this.task.description = '';
@@ -146,14 +170,15 @@ export default {
             await TaskService.deleteTask(params)
             this.getTasks()
         },
-        async editTask (taskId) {
-          await TaskService.updateTask({
-            id: taskId,
-            isDone: true
-          })
+        async editTask (taskId) {            
+            await TaskService.updateTask({
+                id: taskId,
+                isDone: true,
+                date: this.task.date
+            })
           this.getTasks();
-        }
-      },
+        },
+      }
     }
 </script>
 

@@ -6,7 +6,8 @@ router.post('/tasks', (req, res) => {
     const task = new Task({
       title: req.body.title,
       description: req.body.description,
-      isDone: req.body.isDone
+      isDone: req.body.isDone,
+      date: req.body.date
     })
     task.save((err, data) => {
       if (err) {
@@ -20,7 +21,7 @@ router.post('/tasks', (req, res) => {
   })
   
 router.get('/tasks', (req, res) => {
-  Task.find({isDone: {$eq: false} }, 'title description', (err, tasks) => {
+  Task.find({isDone: {$eq: false} }, 'title description date', (err, tasks) => {
     if (err) {
       res.sendStatus(500)
     } else {
@@ -30,7 +31,7 @@ router.get('/tasks', (req, res) => {
 })
 
 router.get('/archive', (req, res) => {
-  Task.find({isDone: {$eq: true} }, 'title description', (err, tasks) => {
+  Task.find({isDone: {$eq: true} }, 'title description date', (err, tasks) => {
     if (err) {
       res.sendStatus(500)
     } else {
@@ -62,6 +63,9 @@ router.put('/tasks/:id', (req, res) => {
       }
       if (req.body.isDone) {
         task.isDone = req.body.isDone
+      }
+      if (req.body.date) {
+        task.date = req.body.date
       }
       task.save(err => {
         if (err) {
