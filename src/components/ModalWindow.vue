@@ -8,12 +8,10 @@
                 <v-container>
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field label="Назва*" required color="secondary" v-model.trim="task.title"> </v-text-field>
+                            <v-textarea label="Назва*" color="desc" auto-grow outlined rows="1" v-model.trim="task.title"></v-textarea>
+                            <v-textarea color="desc" outlined label="Опис" v-model.trim="task.description"></v-textarea>
                         </v-col>
-                        <v-col cols="12">
-                            <v-text-field label="Опис" color="secondary" v-model.trim="task.description"> </v-text-field>
-                        </v-col>
-                    </v-row>
+                        </v-row>
                 </v-container>
                 <small>*обов'язкові поля</small>
             </v-card-text>

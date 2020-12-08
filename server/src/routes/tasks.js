@@ -41,7 +41,7 @@ router.get('/archive', (req, res) => {
 })
 
 router.get('/tasks/:id', (req, res) => {
-  Task.findById(req.params.id, 'title description', (err, task) => {
+  Task.findById(req.params.id, 'title description date', (err, task) => {
     if (err) {
       res.sendStatus(500)
     } else {
@@ -51,14 +51,14 @@ router.get('/tasks/:id', (req, res) => {
 })
 
 router.put('/tasks/:id', (req, res) => {
-  Task.findById(req.params.id, 'title description isDone', (err, task) => {
+  Task.findById(req.params.id, 'title description isDone date', (err, task) => {
     if (err) {
       console.log(err)
     } else {
       if (req.body.title) {
         task.title = req.body.title
       }
-      if (req.body.description || !req.body.description) {
+      if (req.body.description) {
         task.description = req.body.description
       }
       if (req.body.isDone) {

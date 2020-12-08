@@ -48,6 +48,15 @@
                 </v-list-item-content>
             </v-list-item>
             <v-divider></v-divider>
+            <v-list-item>
+                <v-list-item-content>
+                    
+                    <v-list-item-subtitle class="title white--text" small>
+                        <span v-text="currentTime"></span>
+                    </v-list-item-subtitle>
+                </v-list-item-content>
+            </v-list-item>
+            <v-divider></v-divider>
             <v-list dense nav>
                 <v-list-item v-for="link in links" :key="link.title" router :to="link.route">
                     <v-list-item-icon>
@@ -57,13 +66,15 @@
                     <v-list-item-content>
                         <v-list-item-title class="white--text">{{ link.title }}</v-list-item-title>
                     </v-list-item-content>
-                </v-list-item>
-            </v-list>   
+                    
+                </v-list-item>             
+            </v-list> 
         </v-navigation-drawer>
     </nav>
 </template>
 
 <script>
+import moment from 'moment'
 export default {
     data() {
         return {
@@ -72,15 +83,21 @@ export default {
             switchState: (localStorage.getItem('dark_theme') === 'true'),
             menu: false,
             drawer: false,
+            currentTime: null,
             links: [
                 { title: 'Активні задачі', icon: 'mdi-view-dashboard', route: '/tasks' },
                 { title: 'Архів', icon: 'archive', route: '/archive' },
-                { title: 'Про додаток', icon: 'mdi-help-box', route: '/about' },
+                // { title: 'Про додаток', icon: 'mdi-help-box', route: '/about' },
             ],
         }
     },
     mounted() {
         this.$vuetify.theme.dark = localStorage.getItem('dark_theme') === 'true';
+    },
+    created() {
+        moment().locale('uk');
+        this.currentTime = moment().format("LTS");
+        setInterval(() => this.updateCurrentTime(), 1 * 1000);
     },
     methods: {
         toggleDarkTheme() {
@@ -88,6 +105,10 @@ export default {
             localStorage.setItem("dark_theme", this.$vuetify.theme.dark.toString());
             console.log(this.switchState)
         },
+        updateCurrentTime() {
+            moment.locale('uk')
+            this.currentTime = moment().format("LTS");
+        }
     },
 }
 </script>

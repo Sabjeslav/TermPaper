@@ -18,10 +18,8 @@
                                 <v-container>
                                     <v-row>
                                     <v-col cols="12">
-                                        <v-text-field label="Назва*" required color="secondary" v-model.trim="task.title"> </v-text-field>
-                                    </v-col>
-                                    <v-col cols="12">
-                                        <v-text-field label="Опис" color="secondary" v-model.trim="task.description"> </v-text-field>
+                                        <v-textarea label="Назва*" color="desc" auto-grow outlined rows="1" v-model.trim="task.title"></v-textarea>
+                                        <v-textarea color="desc" outlined label="Опис" v-model.trim="task.description"></v-textarea>
                                     </v-col>
                                     </v-row>
                                 </v-container>
@@ -46,11 +44,17 @@
                     </template>
                     <template v-else>
                         
-                        <v-col cols="12"> 
-                            
+                        <v-col cols="12" class="mt-5"> 
+                            <v-text-field
+                                v-model="keyword"
+                                label="Пошук за назвою"
+                                flat
+                                solo-inverted
+                                hide-details
+                            ></v-text-field>
                         </v-col>
                         
-                        <v-col  v-for="task in tasks" :key="task._id" cols="12" md="6" lg="4" xl="3" >
+                        <v-col  v-for="task in taskFilteredList" :key="task._id" cols="12" md="6" lg="4" xl="3" >
                             
                             <v-card elevation-11 fill-height>
 
@@ -60,9 +64,25 @@
 
                                     <v-divider></v-divider>
 
-                                <v-card-text >
-                                    {{task.description}}
-                                </v-card-text>
+                                <template v-if="task.description.length>50">
+                                    <v-expansion-panels accordion flat class="tooltipMargin">
+                                        <v-expansion-panel>
+                                            <v-expansion-panel-header>
+                                                Опис
+                                            </v-expansion-panel-header>
+
+                                            <v-expansion-panel-content>
+                                                    {{task.description}}
+                                            </v-expansion-panel-content>
+                                        </v-expansion-panel>
+                                    </v-expansion-panels>
+                                </template>
+
+                                <template v-else>
+                                    <v-card-text>
+                                        {{task.description}}
+                                    </v-card-text>
+                                </template>
 
                                     <v-spacer></v-spacer>
 
@@ -87,8 +107,7 @@
                                         </v-tooltip>
                                     </router-link>
 
-                                    <!-- <v-spacer></v-spacer> -->
-
+                                
                                     <v-tooltip bottom>
                                         <template v-slot:activator="{ on }">
                                             <v-btn class="ml-2" outlined rounded text v-on="on" @click="removeTask(task._id)">
@@ -100,15 +119,28 @@
                                     
                                     <v-spacer></v-spacer>
                                      
-                                    <v-chip color="accent" class="date--text">
-                                        {{task.date}}
-                                    </v-chip>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <v-chip color="accent" class="date--text" v-on="on">
+                                                {{task.date}}
+                                            </v-chip>
+                                        </template>
+                                        <span>Дата додавання</span>
+                                    </v-tooltip>
                                 </v-card-actions>   
                             </v-card>
                             
                         </v-col>                          
                     </template> 
                 </template>
+                <v-snackbar v-model="snackbar" :timeout="timeout">
+                    Задача успішно додана
+                    <template v-slot:action="{ attrs }">
+                        <v-btn color="success" text v-bind="attrs" @click="snackbar = !snackbar">
+                            Закрити
+                        </v-btn>
+                    </template>
+                </v-snackbar>
             </v-row>
         </v-container>
     </div>
@@ -119,7 +151,10 @@ import TaskService from '../services/TaskService'
 export default {
     data() {
         return {
+            snackbar: false,
             dialog: false,
+            timeout: 3000,
+            keyword: '',
             task: {title: '', description: '', isDone: false, date: ''},
             tasks: []
         }
@@ -128,11 +163,21 @@ export default {
         this.getTasks(),
         this.datePicker()
     },
+    computed: {
+        taskFilteredList: function() {
+            let searchTask = this.keyword.toLowerCase();
+            return this.tasks.filter(function(elem) {
+                if (searchTask === "") return true;
+                else return elem.title.toLowerCase().indexOf(searchTask) > -1;
+            })  
+        }
+    },
     methods: {
         addHandler () {
             this.addTask();
             this.dialog = !this.dialog;
             this.task.title = this.task.description = '';
+            
         },
         closeHandler () {
             this.dialog = !this.dialog;
@@ -160,6 +205,7 @@ export default {
                     isDone: false,
                     date: this.task.date
                 })
+                this.snackbar = !this.snackbar;
                 this.getTasks();
                 this.task.title = this.task.description = '';
             } else {
@@ -185,5 +231,8 @@ export default {
 <style>
     *{
         transition: 0.2s;
+    }
+    .tooltipMargin {
+        margin-bottom: 5.5px;
     }
 </style>
