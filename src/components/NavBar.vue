@@ -3,7 +3,7 @@
         <v-app-bar app color="primary">
             <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
             <v-toolbar-title class="text-uppercase">
-                <span class="font-weight-light">Time</span>
+                <span class="font-weight-light">Task</span>
                 <span>Manager</span>
             </v-toolbar-title>
             <v-spacer></v-spacer>
@@ -87,7 +87,6 @@ export default {
             links: [
                 { title: 'Активні задачі', icon: 'mdi-view-dashboard', route: '/tasks' },
                 { title: 'Архів', icon: 'archive', route: '/archive' },
-                // { title: 'Про додаток', icon: 'mdi-help-box', route: '/about' },
             ],
         }
     },

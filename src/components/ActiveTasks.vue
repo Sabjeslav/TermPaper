@@ -39,7 +39,7 @@
                     </v-row>
                     <template v-if="tasks.length == 0">
                         <v-col cols="12" class="text-center mt-15">
-                            <span class="text--secondary text-xl-h4 text-md-h4 text-sm-h5 text-xs-h1" max-width="90%" style="user-select: none;"> Ви ще не додали жодної задачі </span>
+                            <span class="text--secondary text-xl-h4 text-md-h4 text-sm-h5 text-xs-h1" max-width="90%" style="user-select: none;"> У Вас немає активних задач! </span>
                         </v-col>
                     </template>
                     <template v-else>
