@@ -87,8 +87,8 @@
 
                 <v-divider></v-divider>
 
-                <v-tabs grow>
-                  <v-tab> Опис </v-tab>
+                <v-tabs color="date" grow>
+                  <v-tab > Опис </v-tab>
                   <v-tab> Підзадачі </v-tab>
                   <v-tab-item>
                     <template v-if="task.description.length > 50">
@@ -122,14 +122,14 @@
                         <v-list-item-action>
                           <v-checkbox
                             v-model="subtask.isDone"
-                            :color="(subtask.isDone && 'grey') || 'primary'"
+                            :color="(subtask.isDone && 'grey') || 'date'"
                             @change="subtaskHandler(task._id, i)"
                           >
                             <template v-slot:label>
                               <div
                                 :class="
                                   (subtask.isDone && 'grey--text') ||
-                                  'primary--text'
+                                  'date--text'
                                 "
                                 class="ml-4"
                                 v-text="subtask.text"
@@ -145,6 +145,24 @@
                             mdi-check
                           </v-icon>
                         </v-scroll-x-transition>
+                        <v-menu bottom right>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-btn icon v-bind="attrs" v-on="on">
+                              <v-icon>mdi-dots-vertical</v-icon>
+                            </v-btn>
+                          </template>
+
+                          <v-list dense>
+                            <!-- <v-list-item link>
+                              <v-list-item-title @click="testFunc()">
+                                Редагувати
+                              </v-list-item-title>
+                            </v-list-item> -->
+                            <v-list-item link @click="deleteSubTaskHandler(task._id, i)">
+                              <v-list-item-title> Видалити </v-list-item-title>
+                            </v-list-item>
+                          </v-list>
+                        </v-menu>
                       </v-list-item>
                     </template>
                     <v-list-item>
@@ -292,6 +310,9 @@ export default {
     },
   },
   methods: {
+    testFunc() {
+      console.log("It's a test function message!");
+    },
     addHandler() {
       this.addTask();
       this.dialog = !this.dialog;
@@ -317,6 +338,16 @@ export default {
         id: taskId,
         subtasks: subtasks,
       });
+    },
+    async deleteSubTaskHandler(taskId, subtaskIndex) {
+      const { subtasks } = await this.getTaskById(taskId);
+      const index = subtasks.findIndex((subtask, index) => index === subtaskIndex);
+      subtasks.splice(index, 1);
+      await TaskService.updateTask({
+        id: taskId,
+        subtasks: subtasks,
+      });
+      this.getTasks();
     },
     async getTasks() {
       const response = await TaskService.fetchTasks();
