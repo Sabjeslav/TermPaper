@@ -76,7 +76,7 @@
             <v-col
               v-for="task in taskFilteredList"
               :key="task._id"
-              xs="12"
+              cols="12"
               md="6"
               lg="4"
             >
@@ -98,7 +98,7 @@
                             Опис
                           </v-expansion-panel-header>
 
-                          <v-expansion-panel-content>
+                          <v-expansion-panel-content class="cardDescription">
                             {{ task.description }}
                           </v-expansion-panel-content>
                         </v-expansion-panel>
@@ -106,7 +106,7 @@
                     </template>
 
                     <template v-else>
-                      <v-card-text>
+                      <v-card-text class="cardDescription">
                         {{ task.description }}
                       </v-card-text>
                     </template>
@@ -123,6 +123,7 @@
                           <v-checkbox
                             v-model="subtask.isDone"
                             :color="(subtask.isDone && 'grey') || 'primary'"
+                            @change="subtaskHandler(task._id, i)"
                           >
                             <template v-slot:label>
                               <div
@@ -148,20 +149,17 @@
                     </template>
                     <v-list-item>
                       <v-text-field
-                        v-model="newSubtask"
+                        class="mt-5"
+                        v-model="task.innerSubTask"
                         label="Над чим ви працюєте?"
                         solo
-                        @keydown.enter="
-                          addSubtask(task._id);
-                        "
+                        @keydown.enter="addSubtask(task._id, task.innerSubTask)"
                       >
                         <template v-slot:append>
                           <v-fade-transition>
                             <v-icon
-                              v-if="newSubtask"
-                              @click="
-                                addSubtask(task._id);
-                              "
+                              v-if="task.innerSubTask"
+                              @click="addSubtask(task._id, task.innerSubTask)"
                             >
                               add_circle
                             </v-icon>
@@ -275,6 +273,7 @@ export default {
         isDone: false,
         date: "",
         subtasks: [],
+        innerSubTask: "",
       },
       newSubtask: "",
       tasks: [],
@@ -304,6 +303,20 @@ export default {
     },
     resetInputs() {
       this.task.title = this.task.description = "";
+    },
+    async subtaskHandler(taskId, subtaskIndex) {
+      const { subtasks } = await this.getTaskById(taskId);
+      let status = subtasks.find((subtask, index) => index === subtaskIndex);
+      status.isDone = !status.isDone;
+      subtasks.find((subtask, index) => {
+        if (index === subtaskIndex) {
+          subtask = status;
+        }
+      });
+      await TaskService.updateTask({
+        id: taskId,
+        subtasks: subtasks,
+      });
     },
     async getTasks() {
       const response = await TaskService.fetchTasks();
@@ -345,12 +358,14 @@ export default {
       });
       this.getTasks();
     },
-    async addSubtask(taskId) {
-      const {subtasks} = await this.getTaskById(taskId);
+    async addSubtask(taskId, text) {
+      this.newSubtask = text;
+      if (!this.newSubtask) return;
+      const { subtasks } = await this.getTaskById(taskId);
       subtasks.push({
         isDone: false,
-        text: this.newSubtask
-      })
+        text: this.newSubtask,
+      });
       await TaskService.updateTask({
         id: taskId,
         subtasks: subtasks,
@@ -368,5 +383,8 @@ export default {
 }
 .tooltipMargin {
   margin-bottom: 5.5px;
+}
+.cardDescription {
+  font-size: 20px !important;
 }
 </style>
