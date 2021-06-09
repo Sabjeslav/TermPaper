@@ -14,6 +14,9 @@ const TaskSchema = new Schema({
   date: { 
     type: String,
   },
+  subtasks: {
+    type: Array
+  }
 })
 const TaskModel = mongoose.model('tasks', TaskSchema)
 module.exports = TaskModel
