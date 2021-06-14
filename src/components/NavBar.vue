@@ -11,7 +11,7 @@
         <v-menu v-model="menu" :close-on-content-click="false" offset-y>
           <template v-slot:activator="{ on }">
             <v-btn text v-on="on">
-              <span class="d-none d-sm-flex">Налаштування</span>
+              <span class="d-none d-sm-flex">{{navBar.settings}}</span>
               <v-icon right>mdi-cog</v-icon>
             </v-btn>
           </template>
@@ -27,7 +27,32 @@
                       persistent-hint
                     ></v-switch>
                   </v-list-item-action>
-                  <v-list-item-title>Темна тема</v-list-item-title>
+                  <v-list-item-title>{{navBar.theme}}</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-menu offset-y>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn color="primary" dark v-bind="attrs" v-on="on">
+                        {{navBar.lang}}
+                      </v-btn>
+                    </template>
+                    <v-list>
+                      <v-list-item link @click="selectEn()">
+                        <img
+                          class="countryFlag"
+                          src="https://www.countryflags.io/us/flat/64.png"
+                        />
+                        <v-list-item-title>English</v-list-item-title>
+                      </v-list-item>
+                      <v-list-item link @click="selectUa()">
+                        <img
+                          class="countryFlag"
+                          src="https://www.countryflags.io/ua/flat/64.png"
+                        />
+                        <v-list-item-title>Українська</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
                 </v-list-item>
               </v-list>
             </v-card>
@@ -35,7 +60,7 @@
         </v-menu>
       </div>
       <v-btn text>
-        <span class="d-none d-sm-flex">Вийти</span>
+        <span class="d-none d-sm-flex">{{navBar.exit}}</span>
         <v-icon right>mdi-exit-to-app</v-icon>
       </v-btn>
     </v-app-bar>
@@ -44,10 +69,10 @@
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="title white--text">
-            Меню
+            {{navBar.menu.title}}
           </v-list-item-title>
           <v-list-item-subtitle class="white--text" small>
-            задач
+            {{navBar.menu.subTitle}}
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -84,6 +109,10 @@
 
 <script>
 import moment from "moment";
+import lang from "../lang/lang";
+
+const {navBar} = lang;
+
 export default {
   data() {
     return {
@@ -93,13 +122,14 @@ export default {
       menu: false,
       drawer: false,
       currentTime: null,
+      navBar: navBar,
       links: [
         {
-          title: "Активні задачі",
+          title: navBar.activeTasks,
           icon: "mdi-view-dashboard",
           route: "/tasks",
         },
-        { title: "Архів", icon: "archive", route: "/archive" },
+        { title: navBar.archive, icon: "archive", route: "/archive" },
       ],
     };
   },
@@ -115,12 +145,19 @@ export default {
     toggleDarkTheme() {
       this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
       localStorage.setItem("dark_theme", this.$vuetify.theme.dark.toString());
-      console.log(this.switchState);
     },
     updateCurrentTime() {
       moment.locale("uk");
       this.currentTime = moment().format("LTS");
     },
+    selectEn() {
+      localStorage.setItem('lang', 'en');
+      location.reload()
+    },
+    selectUa() {
+      localStorage.setItem('lang', 'ua');
+      location.reload();
+    }
   },
 };
 </script>
@@ -130,5 +167,9 @@ export default {
 *::before,
 *::after {
   transition: 0.2s;
+}
+.countryFlag {
+  max-width: 30px !important;
+  margin-right: 5px !important;
 }
 </style>

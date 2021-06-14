@@ -3,23 +3,23 @@
     <v-container>
       <v-row>
         <template>
-          <v-row>
+          <v-row class="addBtn">
             <v-dialog v-model="dialog" persistent max-width="600px">
               <template v-slot:activator="{ on }">
                 <v-btn color="primary" block v-on="on" x-large>
-                  Додати задачу
+                  {{ activeTasks.addTask }}
                 </v-btn>
               </template>
               <v-card style="user-select: none">
                 <v-card-title>
-                  <span class="headline">Нова задача</span>
+                  <span class="headline">{{ activeTasks.newTask }}</span>
                 </v-card-title>
                 <v-card-text>
                   <v-container>
                     <v-row>
                       <v-col cols="12">
                         <v-textarea
-                          label="Назва*"
+                          v-bind:label=activeTasks.modalName
                           color="desc"
                           auto-grow
                           outlined
@@ -29,21 +29,21 @@
                         <v-textarea
                           color="desc"
                           outlined
-                          label="Опис"
+                          v-bind:label=activeTasks.description
                           v-model.trim="task.description"
                         ></v-textarea>
                       </v-col>
                     </v-row>
                   </v-container>
-                  <small>*обов'язкові поля</small>
+                  <small>{{ activeTasks.required }}</small>
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="blue darken-1" text @click="closeHandler">
-                    Закрити
+                    {{ activeTasks.close }}
                   </v-btn>
                   <v-btn color="blue darken-1" text @click="addHandler">
-                    Зберегти
+                    {{ activeTasks.save }}
                   </v-btn>
                 </v-card-actions>
               </v-card>
@@ -58,7 +58,7 @@
                 max-width="90%"
                 style="user-select: none"
               >
-                У Вас немає активних задач!
+                {{ activeTasks.emptyMsg }}
               </span>
             </v-col>
           </template>
@@ -66,7 +66,7 @@
             <v-col cols="12" class="mt-5">
               <v-text-field
                 v-model="keyword"
-                label="Пошук за назвою"
+                v-bind:label=activeTasks.searchLabel
                 flat
                 solo-inverted
                 hide-details
@@ -88,14 +88,14 @@
                 <v-divider></v-divider>
 
                 <v-tabs color="date" grow>
-                  <v-tab > Опис </v-tab>
-                  <v-tab> Підзадачі </v-tab>
+                  <v-tab> {{ activeTasks.description }} </v-tab>
+                  <v-tab> {{ activeTasks.subtasks }} </v-tab>
                   <v-tab-item>
                     <template v-if="task.description.length > 50">
                       <v-expansion-panels accordion flat class="tooltipMargin">
                         <v-expansion-panel>
                           <v-expansion-panel-header>
-                            Опис
+                            {{ activeTasks.description }}
                           </v-expansion-panel-header>
 
                           <v-expansion-panel-content class="cardDescription">
@@ -153,13 +153,13 @@
                           </template>
 
                           <v-list dense>
-                            <!-- <v-list-item link>
-                              <v-list-item-title @click="testFunc()">
-                                Редагувати
+                            <v-list-item
+                              link
+                              @click="deleteSubTaskHandler(task._id, i)"
+                            >
+                              <v-list-item-title>
+                                {{ activeTasks.delete }}
                               </v-list-item-title>
-                            </v-list-item> -->
-                            <v-list-item link @click="deleteSubTaskHandler(task._id, i)">
-                              <v-list-item-title> Видалити </v-list-item-title>
                             </v-list-item>
                           </v-list>
                         </v-menu>
@@ -169,7 +169,7 @@
                       <v-text-field
                         class="mt-5"
                         v-model="task.innerSubTask"
-                        label="Над чим ви працюєте?"
+                        v-bind:label=activeTasks.label
                         solo
                         @keydown.enter="addSubtask(task._id, task.innerSubTask)"
                       >
@@ -203,7 +203,7 @@
                         <v-icon color="green">done_all</v-icon>
                       </v-btn>
                     </template>
-                    <span>Виконано</span>
+                    <span>{{ activeTasks.done }}</span>
                   </v-tooltip>
 
                   <router-link
@@ -218,7 +218,7 @@
                           >
                         </v-btn>
                       </template>
-                      <span>Редагувати</span>
+                      <span>{{ activeTasks.edit }}</span>
                     </v-tooltip>
                   </router-link>
 
@@ -240,7 +240,7 @@
                         >
                       </v-btn>
                     </template>
-                    <span>Видалити</span>
+                    <span>{{ activeTasks.delete }}</span>
                   </v-tooltip>
 
                   <v-spacer></v-spacer>
@@ -251,7 +251,7 @@
                         {{ task.date }}
                       </v-chip>
                     </template>
-                    <span>Дата додавання</span>
+                    <span>{{ activeTasks.creationDate }}</span>
                   </v-tooltip>
                 </v-card-actions>
               </v-card>
@@ -259,7 +259,7 @@
           </template>
         </template>
         <v-snackbar v-model="snackbar" :timeout="timeout">
-          Задача успішно додана
+          {{ activeTasks.successMsg }}
           <template v-slot:action="{ attrs }">
             <v-btn
               color="success"
@@ -267,7 +267,7 @@
               v-bind="attrs"
               @click="snackbar = !snackbar"
             >
-              Закрити
+              {{activeTasks.close}}
             </v-btn>
           </template>
         </v-snackbar>
@@ -278,6 +278,10 @@
 
 <script>
 import TaskService from "../services/TaskService";
+import lang from "../lang/lang";
+
+const { activeTasks } = lang;
+
 export default {
   data() {
     return {
@@ -293,6 +297,7 @@ export default {
         subtasks: [],
         innerSubTask: "",
       },
+      activeTasks: activeTasks,
       newSubtask: "",
       tasks: [],
     };
@@ -341,7 +346,9 @@ export default {
     },
     async deleteSubTaskHandler(taskId, subtaskIndex) {
       const { subtasks } = await this.getTaskById(taskId);
-      const index = subtasks.findIndex((subtask, index) => index === subtaskIndex);
+      const index = subtasks.findIndex(
+        (subtask, index) => index === subtaskIndex
+      );
       subtasks.splice(index, 1);
       await TaskService.updateTask({
         id: taskId,
@@ -417,5 +424,9 @@ export default {
 }
 .cardDescription {
   font-size: 20px !important;
+}
+.addBtn {
+  max-width: 98.5% !important;
+  margin: 0 auto !important;
 }
 </style>

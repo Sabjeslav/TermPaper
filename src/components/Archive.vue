@@ -12,13 +12,13 @@
                 max-width="90%"
                 style="user-select: none"
               >
-                Ви ще не виконали жодної задачі
+                {{archive.emptyMsg}}
               </span>
             </v-col>
           </template>
           <template v-else>
             <v-col cols="12">
-              <strong color="date">Виконано задач: {{ tasks.length }}</strong>
+              <strong color="date">{{archive.done}} {{ tasks.length }}</strong>
             </v-col>
 
             <v-col
@@ -40,7 +40,7 @@
                   <v-expansion-panels accordion flat class="tooltipMargin">
                     <v-expansion-panel>
                       <v-expansion-panel-header>
-                        Опис
+                        {{archive.description}}
                       </v-expansion-panel-header>
 
                       <v-expansion-panel-content>
@@ -59,7 +59,7 @@
                 <v-spacer></v-spacer>
 
                 <v-card-actions>
-                  <v-chip color="doneTask"> Виконано: {{ task.date }} </v-chip>
+                  <v-chip color="doneTask"> {{archive.doneDate}} {{ task.date }} </v-chip>
 
                   <v-spacer></v-spacer>
 
@@ -80,7 +80,7 @@
                         >
                       </v-btn>
                     </template>
-                    <span>Видалити</span>
+                    <span>{{archive.delete}}</span>
                   </v-tooltip>
                 </v-card-actions>
               </v-card>
@@ -94,15 +94,20 @@
 
 <script>
 import TaskService from "../services/TaskService";
+import lang from "../lang/lang";
+
+const {archive} = lang;
+
 export default {
   data() {
     return {
       task: { title: "", description: "", isDone: false },
       tasks: [],
+      archive: archive,
     };
   },
   mounted() {
-    this.getTasks(), console.log(this.tasks);
+    this.getTasks();
   },
   methods: {
     async getTasks() {
